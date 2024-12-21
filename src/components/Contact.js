@@ -1,82 +1,128 @@
 import React, { useState } from 'react';
 import '../css/App.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 
 function Contact() {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        message: ''
+    });
+
+    const [formErrors, setFormErrors] = useState({});
     const [isSuccess, setIsSuccess] = useState(false);
     const [isError, setIsError] = useState(false);
 
+    const validateForm = (data) => {
+        let errors = {};
+        if (!data.name.trim()) errors.name = 'Le nom est requis.';
+        if (!data.email) {
+            errors.email = 'L\'email est requis.';
+        } else if (!/\S+@\S+\.\S+/.test(data.email)) {
+            errors.email = 'L\'email est invalide.';
+        }
+        if (!data.phone) {
+            errors.phone = 'Le numéro de téléphone est requis.';
+        } else if (!/^\d+$/.test(data.phone)) {
+            errors.phone = 'Le numéro de téléphone doit être numérique.';
+        }
+        if (!data.message.trim()) errors.message = 'Le message est requis.';
+        return errors;
+    };
+
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setFormData({ ...formData, [id]: value });
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
+        const errors = validateForm(formData);
+        setFormErrors(errors);
 
-        // Simulation d'un envoi de formulaire (en réalité, vous ferez un appel à une API ou un serveur)
-        const formValid = Math.random() > 0.5; // 50% de chance de succès
-
-        if (formValid) {
-            setIsSuccess(true);
-            setIsError(false);
+        if (Object.keys(errors).length === 0) {
+            const formValid = Math.random() > 0.5; // Simulation de validation
+            if (formValid) {
+                setIsSuccess(true);
+                setIsError(false);
+                setFormData({ name: '', email: '', phone: '', message: '' });
+            } else {
+                setIsSuccess(false);
+                setIsError(true);
+            }
         } else {
             setIsSuccess(false);
-            setIsError(true);
         }
     };
 
     return (
-        <section className="page-section" id="contact">
-            <div className="container px-4 px-lg-5">
-                <div className="row gx-4 gx-lg-5 justify-content-center">
-                    <div className="col-lg-8 col-xl-6 text-center">
-                        <h2 className="mt-0">Contactez-moi</h2>
-                        <hr className="divider" />
-                        <p className="text-muted mb-5">Prêt à démarrer un projet ? Envoyez-moi un message et je reviendrai vers vous dès que possible.</p>
-                    </div>
+        <div style={{ position: 'relative' }}>
+            <form onSubmit={handleSubmit} className="contact-form">
+                <h2>Contactez-nous</h2>
+                <div className="form-field">
+                    <label htmlFor="name">Nom complet :</label>
+                    <input
+                        type="text"
+                        id="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        aria-required="true"
+                        className={formErrors.name ? 'error' : ''}
+                    />
+                    {formErrors.name && <span className="error-message">{formErrors.name}</span>}
                 </div>
-                <div className="row gx-4 gx-lg-5 justify-content-center mb-5">
-                    <div className="col-lg-6">
-                        <form id="contactForm" onSubmit={handleSubmit}>
-                            <div className="form-floating mb-3">
-                                <input className="form-control" id="name" type="text" placeholder="Votre nom" required />
-                                <label htmlFor="name">Nom complet</label>
-                            </div>
-
-                            <div className="form-floating mb-3">
-                                <input className="form-control" id="email" type="email" placeholder="nom@exemple.com" required />
-                                <label htmlFor="email">Adresse email</label>
-                            </div>
-
-                            <div className="form-floating mb-3">
-                                <input className="form-control" id="phone" type="tel" placeholder="(123) 456-7890" required />
-                                <label htmlFor="phone">Numéro de téléphone</label>
-                            </div>
-
-                            <div className="form-floating mb-3">
-                                <textarea className="form-control" id="message" placeholder="Entrez votre message ici..." style={{ height: '10rem' }} required></textarea>
-                                <label htmlFor="message">Message</label>
-                            </div>
-
-                            {/* Messages de succès ou d'erreur */}
-                            {isSuccess && (
-                                <div className="text-center mb-3">
-                                    <div className="fw-bolder">Soumission réussie !</div>
-                                    Vous pouvez maintenant envoyer votre message.
-                                </div>
-                            )}
-
-                            {isError && (
-                                <div className="text-center text-danger mb-3">
-                                    Erreur lors de l'envoi du message !
-                                </div>
-                            )}
-
-                            <div className="d-grid">
-                                <button className="btn btn-primary btn-xl" id="submitButton" type="submit">
-                                    Envoyer le message
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                <div className="form-field">
+                    <label htmlFor="email">Adresse e-mail :</label>
+                    <input
+                        type="email"
+                        id="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        aria-required="true"
+                        className={formErrors.email ? 'error' : ''}
+                    />
+                    {formErrors.email && <span className="error-message">{formErrors.email}</span>}
                 </div>
+                <div className="form-field">
+                    <label htmlFor="phone">Numéro de téléphone :</label>
+                    <input
+                        type="text"
+                        id="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        aria-required="true"
+                        className={formErrors.phone ? 'error' : ''}
+                    />
+                    {formErrors.phone && <span className="error-message">{formErrors.phone}</span>}
+                </div>
+                <div className="form-field">
+                    <label htmlFor="message">Message :</label>
+                    <textarea
+                        id="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        aria-required="true"
+                        className={formErrors.message ? 'error' : ''}
+                    />
+                    {formErrors.message && <span className="error-message">{formErrors.message}</span>}
+                </div>
+                <button type="submit">Envoyer</button>
+                {isSuccess && <p className="success-message">Votre message a été envoyé avec succès.</p>}
+                {isError && <p className="error-message">Une erreur est survenue, veuillez réessayer.</p>}
+            </form>
+            <div className="whatsapp-icon">
+                <a
+                    href={`https://wa.me/221776828441`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Contacter sur WhatsApp"
+                >
+                    <FontAwesomeIcon icon={faWhatsapp} size="3x" />
+                </a>
             </div>
-        </section>
+        </div>
     );
 }
 
